@@ -26,9 +26,14 @@
        - a FILLED slot:  {
            title: "Project name",
            description: "A sentence or two about it.",
-           type: "video" | "audio" | "image",
+           type: "video" | "audio" | "image" | "youtube",
            src: "assets/videos/yourfile.mp4"   <- path RELATIVE to this html file
          }
+     For type "youtube", set src to either the full URL
+     (e.g. "https://www.youtube.com/watch?v=dQw4w9WgXcQ" or a youtu.be link)
+     or just the bare video ID ("dQw4w9WgXcQ"). Clicking the cassette will
+     open the lightbox and embed the YouTube player instead of a local file
+     — no video file needs to live in assets/ for that slot.
   3. Put this portfolio.html file inside the same folder that CONTAINS your
      "assets" folder, e.g.:
         .../portfolio/portfolio.html
@@ -455,6 +460,22 @@
     border-radius:2px;
   }
   .lightbox-media audio{ width:100%; }
+  .lightbox-media .yt-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    border-radius:2px;
+    overflow:hidden;
+    background:#000;
+  }
+  .lightbox-media .yt-wrap iframe{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+  }
   .lightbox-desc{
     margin-top:16px;
     color:var(--dim);
@@ -672,6 +693,7 @@ function renderTape(slot, accent, catLabel){
 
   el.className = 'tape filled' + (slot.type === 'image' ? ' type-image' : '');
   const icon = slot.type === 'audio' ? ICONS.audio : slot.type === 'image' ? ICONS.image : ICONS.play;
+  const tagLabel = slot.type === 'youtube' ? 'VIDEO' : (slot.type || 'video').toUpperCase();
   el.innerHTML = `
     <div class="window">
       <span class="reel l"></span><span class="reel r"></span>
@@ -680,10 +702,31 @@ function renderTape(slot, accent, catLabel){
     <div class="label">
       <h3>${slot.title}</h3>
       <p>${slot.description || ''}</p>
-      <span class="tagpill">${(slot.type||'video').toUpperCase()}</span>
+      <span class="tagpill">${tagLabel}</span>
     </div>`;
   el.addEventListener('click', ()=>openLightbox(slot, accent));
   return el;
+}
+
+/* Accepts a full YouTube URL (watch, youtu.be, shorts, embed) or a bare
+   11-char video ID, and returns just the ID (or null if unparseable). */
+function getYouTubeId(src){
+  if(!src) return null;
+  const trimmed = src.trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+  try{
+    const url = new URL(trimmed);
+    if(url.hostname.includes('youtu.be')){
+      return url.pathname.slice(1).split('/')[0] || null;
+    }
+    if(url.hostname.includes('youtube.com')){
+      if(url.searchParams.has('v')) return url.searchParams.get('v');
+      const parts = url.pathname.split('/').filter(Boolean);
+      const idx = parts.findIndex(p => p === 'embed' || p === 'shorts');
+      if(idx !== -1 && parts[idx+1]) return parts[idx+1];
+    }
+  }catch(e){ /* not a valid URL */ }
+  return null;
 }
 
 /* ---------------- LIGHTBOX LOGIC ---------------- */
@@ -703,6 +746,13 @@ function openLightbox(slot, accent){
     lbMedia.innerHTML = `<div class="placeholder-note">This is a design sample, not a real file. Replace this slot's data entry with a real "src" path (video / audio / image) and this will play normally in the lightbox.</div>`;
   } else if(slot.type === 'video'){
     lbMedia.innerHTML = `<video src="${slot.src}" controls autoplay></video>`;
+  } else if(slot.type === 'youtube'){
+    const id = getYouTubeId(slot.src);
+    if(id){
+      lbMedia.innerHTML = `<div class="yt-wrap"><iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="${slot.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+    } else {
+      lbMedia.innerHTML = `<div class="placeholder-note">Couldn't parse a YouTube video ID from "${slot.src}". Use a full watch/youtu.be URL or the bare 11-character ID.</div>`;
+    }
   } else if(slot.type === 'audio'){
     lbMedia.innerHTML = `<audio src="${slot.src}" controls autoplay></audio>`;
   } else if(slot.type === 'image'){
