@@ -1,1 +1,0 @@
-# rickysupriyadi.github.io
