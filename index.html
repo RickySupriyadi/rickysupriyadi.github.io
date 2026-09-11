@@ -39,6 +39,7 @@
      `tags` is an optional array of small 90's-style badges shown on the
      card and in the lightbox, telling viewers which AI model(s) did what.
      Available keys (see TAG_META in the <script> block to add more):
+       "code"     -> AI GENERATED CODE
        "video"    -> AI VIDEO GEN
        "speech"   -> AI SPEECH GEN
        "music"    -> AI MUSIC GEN
@@ -136,7 +137,7 @@
     background:var(--void);
     color:var(--green);
     font-family:var(--mono);
-    font-size:14px;
+    font-size:15px;
     padding:40px;
     z-index:100;
     white-space:pre-wrap;
@@ -181,7 +182,7 @@
     font-family:var(--mono);
     font-weight:700;
     letter-spacing:0.5px;
-    font-size:15px;
+    font-size:16px;
   }
   .brand svg{ flex:none; }
   .deck-nav{
@@ -191,7 +192,7 @@
   }
   .deck-nav button{
     font-family:var(--mono);
-    font-size:14px;
+    font-size:15px;
     letter-spacing:0.5px;
     background:var(--panel);
     color:var(--cream);
@@ -213,14 +214,14 @@
   }
   .hero .kicker{
     font-family:var(--mono);
-    font-size:13px;
+    font-size:14px;
     color:var(--green);
     letter-spacing:1px;
     margin-bottom:18px;
   }
   .hero h1{
     font-family:var(--display);
-    font-size:clamp(18px, 4vw, 32px);
+    font-size:clamp(19px, 4vw, 33px);
     line-height:1.6;
     letter-spacing:0;
     color:var(--cream);
@@ -231,13 +232,13 @@
   .hero .tagline{
     margin-top:20px;
     max-width:56ch;
-    font-size:17px;
+    font-size:18px;
     color:var(--dim);
   }
   .hero .status{
     margin-top:36px;
     font-family:var(--mono);
-    font-size:12px;
+    font-size:13px;
     color:var(--dim);
     display:flex;
     gap:18px;
@@ -268,7 +269,7 @@
     box-shadow:0 0 10px var(--accent);
   }
   .cat-head h2{
-    font-size:21px;
+    font-size:22px;
     letter-spacing:0.3px;
     color:var(--cream);
   }
@@ -276,12 +277,12 @@
     color:var(--dim);
     max-width:64ch;
     margin:14px 0 30px 24px;
-    font-size:16px;
+    font-size:17px;
   }
 
   .subgroup-label{
     font-family:var(--mono);
-    font-size:14px;
+    font-size:15px;
     letter-spacing:1px;
     color:var(--accent);
     margin:28px 0 14px 24px;
@@ -376,7 +377,7 @@
 
   .tape .empty-mark{
     font-family:var(--mono);
-    font-size:14px;
+    font-size:15px;
     color:var(--dim);
     letter-spacing:0.5px;
     text-align:center;
@@ -393,13 +394,13 @@
     border-top:2px solid var(--accent);
   }
   .tape .label h3{
-    font-size:16px;
+    font-size:17px;
     color:var(--cream);
     letter-spacing:0.2px;
   }
   .tape .label p{
     margin-top:6px;
-    font-size:15px;
+    font-size:16px;
     color:var(--dim);
     font-family:var(--sans);
     display:-webkit-box;
@@ -411,7 +412,7 @@
     display:inline-block;
     margin-top:10px;
     font-family:var(--mono);
-    font-size:13px;
+    font-size:14px;
     letter-spacing:0.5px;
     color:var(--accent);
     border:1px solid var(--accent);
@@ -429,7 +430,7 @@
     align-items:center;
     gap:4px;
     font-family:var(--mono);
-    font-size:12px;
+    font-size:13px;
     letter-spacing:0.8px;
     text-transform:uppercase;
     color:#0a0a0f;
@@ -439,7 +440,7 @@
     border-radius:2px;
     box-shadow:2px 2px 0 rgba(0,0,0,0.35);
   }
-  .ai-tag::before{ content:"▸"; font-size:11px; }
+  .ai-tag::before{ content:"▸"; font-size:12px; }
   .lightbox-desc .ai-tags{ margin-top:14px; }
 
   /* ---------------- LIGHTBOX ---------------- */
@@ -472,12 +473,12 @@
     margin-bottom:14px;
   }
   .lightbox-head h3{
-    font-size:18px;
+    font-size:19px;
     color:var(--cream);
   }
   .eject{
     font-family:var(--mono);
-    font-size:14px;
+    font-size:15px;
     background:transparent;
     border:1px solid var(--dim);
     color:var(--dim);
@@ -513,11 +514,11 @@
   .lightbox-desc{
     margin-top:16px;
     color:var(--dim);
-    font-size:16px;
+    font-size:17px;
   }
   .placeholder-note{
     font-family:var(--mono);
-    font-size:14px;
+    font-size:15px;
     color:var(--amber);
     border:1px dashed var(--amber);
     padding:14px;
@@ -529,7 +530,7 @@
   footer{
     padding:40px 0 60px;
     font-family:var(--mono);
-    font-size:13px;
+    font-size:14px;
     color:var(--dim);
     display:flex;
     justify-content:space-between;
@@ -618,7 +619,7 @@ const PROJECT_DATA = [
           description: "AI-generated speech using a custom persona gives the narration natural, non-robotic delivery. The video itself was manually edited in Kdenlive. The script came out of iterative back-and-forth between marketing staff and the AI model until it matched the team's intended voice, and every prompt and system prompt behind it was produced through meta-prompting.",
           type: "youtube",
           src: "https://www.youtube.com/watch?v=XTQ5v-IFvnU",   // or youtu.be link, or just the bare ID
-          tags: ["speech","script","music","code"]
+          tags: ["speech","script"]
         },
         {
           title: "GBI TVC Mini Series",
@@ -659,6 +660,7 @@ const PROJECT_DATA = [
    so viewers know which kind(s) of AI model contributed to the piece.
    Add a `tags: ["key", ...]` array to any slot to use these. */
 const TAG_META = {
+  code:     { label:"AI GENERATED CODE", color:"var(--cyan)"    },
   video:    { label:"AI VIDEO GEN",    color:"var(--magenta)" },
   speech:   { label:"AI SPEECH GEN",   color:"var(--amber)"   },
   music:    { label:"AI MUSIC GEN",    color:"var(--cyan)"    },
