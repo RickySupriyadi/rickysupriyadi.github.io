@@ -27,13 +27,24 @@
            title: "Project name",
            description: "A sentence or two about it.",
            type: "video" | "audio" | "image" | "youtube",
-           src: "assets/videos/yourfile.mp4"   <- path RELATIVE to this html file
+           src: "assets/videos/yourfile.mp4",   <- path RELATIVE to this html file
+           tags: ["speech","music"]              <- OPTIONAL, see below
          }
      For type "youtube", set src to either the full URL
      (e.g. "https://www.youtube.com/watch?v=dQw4w9WgXcQ" or a youtu.be link)
      or just the bare video ID ("dQw4w9WgXcQ"). Clicking the cassette will
      open the lightbox and embed the YouTube player instead of a local file
      — no video file needs to live in assets/ for that slot.
+
+     `tags` is an optional array of small 90's-style badges shown on the
+     card and in the lightbox, telling viewers which AI model(s) did what.
+     Available keys (see TAG_META in the <script> block to add more):
+       "video"    -> AI VIDEO GEN
+       "speech"   -> AI SPEECH GEN
+       "music"    -> AI MUSIC GEN
+       "sfx"      -> AI SFX GEN
+       "script"   -> AI SCRIPT GEN     (writing/story/dialogue generation)
+       "subtitle" -> AI SUBTITLE GEN
   3. Put this portfolio.html file inside the same folder that CONTAINS your
      "assets" folder, e.g.:
         .../portfolio/portfolio.html
@@ -407,6 +418,29 @@
     padding:2px 8px;
     border-radius:2px;
   }
+  .ai-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+  }
+  .ai-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    color:#0a0a0f;
+    background:var(--tag-color, var(--cyan));
+    border:1px solid var(--tag-color, var(--cyan));
+    padding:2px 7px;
+    border-radius:2px;
+    box-shadow:2px 2px 0 rgba(0,0,0,0.35);
+  }
+  .ai-tag::before{ content:"▸"; font-size:9px; }
+  .lightbox-desc .ai-tags{ margin-top:14px; }
 
   /* ---------------- LIGHTBOX ---------------- */
   .lightbox{
@@ -551,7 +585,7 @@
       <button class="eject" id="lbClose">⏏ EJECT</button>
     </div>
     <div class="lightbox-media" id="lbMedia"></div>
-    <p class="lightbox-desc" id="lbDesc"></p>
+    <div class="lightbox-desc" id="lbDesc"></div>
   </div>
 </div>
 
@@ -578,24 +612,22 @@ const PROJECT_DATA = [
     color:"var(--magenta)",
     desc:"Generated video, and generated audio — music, sound effects, and speech.",
     groups:[
-      { name:"VIDEO", accent:"var(--magenta)", slots:[
+      { slots:[
         {
           title: "GH Universal Commercial",
           description: "AI-generated speech using a custom persona gives the narration natural, non-robotic delivery. The video itself was manually edited in Kdenlive. The script came out of iterative back-and-forth between marketing staff and the AI model until it matched the team's intended voice, and every prompt and system prompt behind it was produced through meta-prompting.",
           type: "youtube",
-          src: "https://www.youtube.com/watch?v=XTQ5v-IFvnU"   // or youtu.be link, or just the bare ID       
+          src: "https://www.youtube.com/watch?v=XTQ5v-IFvnU",   // or youtu.be link, or just the bare ID
+          tags: ["speech","script"]
         },
         {
           title: "GBI TVC Mini Series",
-          description: "The narration is performed by an AI model instructed to deliver lines in the style of a drama series narrator, lending the piece a cinematic tone. AI-generated sound effects were incorporated throughout, and the mini-series script was developed with AI guidance at every stage. Final creative decisions, however, remained under the director's control. The production as a whole reflects close collaboration between human talent and multiple AI models.",
+          description: "The narration is performed by an AI model instructed to deliver lines in the style of a drama series narrator, lending the piece a cinematic tone. AI-generated sound effects and music were incorporated throughout, and the mini-series script was developed with AI guidance at every stage. Subtitles were also generated using AI. Final creative decisions, however, remained under the director's control. The production as a whole reflects close collaboration between human talent and multiple AI models.",
           type: "youtube",
-          src: "https://youtu.be/3XhK84t92-s"   // or youtu.be link, or just the bare ID       
+          src: "https://youtu.be/3XhK84t92-s",   // or youtu.be link, or just the bare ID
+          tags: ["speech","music","sfx","script","subtitle"]
         },
-        
-        { empty:true }
-      ]},
-      { name:"AUDIO — MUSIC / SFX / SPEECH", accent:"var(--amber)", slots:[
-        { empty:true }, { empty:true }, { empty:true }
+        { empty:true }, { empty:true }, { empty:true }, { empty:true }
       ]}
     ]
   },
@@ -622,6 +654,27 @@ const PROJECT_DATA = [
     ]
   }
 ];
+
+/* AI generation tags — shown as little 90's-style badges on each tape,
+   so viewers know which kind(s) of AI model contributed to the piece.
+   Add a `tags: ["key", ...]` array to any slot to use these. */
+const TAG_META = {
+  video:    { label:"AI VIDEO GEN",    color:"var(--magenta)" },
+  speech:   { label:"AI SPEECH GEN",   color:"var(--amber)"   },
+  music:    { label:"AI MUSIC GEN",    color:"var(--cyan)"    },
+  sfx:      { label:"AI SFX GEN",      color:"var(--green)"   },
+  script:   { label:"AI SCRIPT GEN",   color:"var(--violet)"  },
+  subtitle: { label:"AI SUBTITLE GEN", color:"var(--cream)"   }
+};
+
+function renderTags(tags){
+  if(!tags || !tags.length) return '';
+  return `<div class="ai-tags">${tags.map(key=>{
+    const meta = TAG_META[key];
+    if(!meta) return '';
+    return `<span class="ai-tag" style="--tag-color:${meta.color}">${meta.label}</span>`;
+  }).join('')}</div>`;
+}
 
 /* ---------------- ICONS ---------------- */
 const ICONS = {
@@ -710,6 +763,7 @@ function renderTape(slot, accent, catLabel){
       <h3>${slot.title}</h3>
       <p>${slot.description || ''}</p>
       <span class="tagpill">${tagLabel}</span>
+      ${renderTags(slot.tags)}
     </div>`;
   el.addEventListener('click', ()=>openLightbox(slot, accent));
   return el;
@@ -747,7 +801,7 @@ function openLightbox(slot, accent){
   lastFocused = document.activeElement;
   lightbox.style.setProperty('--accent', accent);
   lbTitle.textContent = slot.title;
-  lbDesc.textContent = slot.description || '';
+  lbDesc.innerHTML = `${slot.description ? `<p>${slot.description}</p>` : ''}${renderTags(slot.tags)}`;
 
   if(slot.sample){
     lbMedia.innerHTML = `<div class="placeholder-note">This is a design sample, not a real file. Replace this slot's data entry with a real "src" path (video / audio / image) and this will play normally in the lightbox.</div>`;
