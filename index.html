@@ -45,7 +45,6 @@
        "sfx"      -> AI SFX GEN
        "script"   -> AI SCRIPT GEN     (writing/story/dialogue generation)
        "subtitle" -> AI SUBTITLE GEN
-       "code"     -> AI GENERATED CODE
   3. Put this portfolio.html file inside the same folder that CONTAINS your
      "assets" folder, e.g.:
         .../portfolio/portfolio.html
@@ -192,7 +191,7 @@
   }
   .deck-nav button{
     font-family:var(--mono);
-    font-size:12px;
+    font-size:14px;
     letter-spacing:0.5px;
     background:var(--panel);
     color:var(--cream);
@@ -277,12 +276,12 @@
     color:var(--dim);
     max-width:64ch;
     margin:14px 0 30px 24px;
-    font-size:15px;
+    font-size:16px;
   }
 
   .subgroup-label{
     font-family:var(--mono);
-    font-size:12px;
+    font-size:14px;
     letter-spacing:1px;
     color:var(--accent);
     margin:28px 0 14px 24px;
@@ -377,7 +376,7 @@
 
   .tape .empty-mark{
     font-family:var(--mono);
-    font-size:12px;
+    font-size:14px;
     color:var(--dim);
     letter-spacing:0.5px;
     text-align:center;
@@ -394,13 +393,13 @@
     border-top:2px solid var(--accent);
   }
   .tape .label h3{
-    font-size:14px;
+    font-size:16px;
     color:var(--cream);
     letter-spacing:0.2px;
   }
   .tape .label p{
     margin-top:6px;
-    font-size:13px;
+    font-size:15px;
     color:var(--dim);
     font-family:var(--sans);
     display:-webkit-box;
@@ -412,7 +411,7 @@
     display:inline-block;
     margin-top:10px;
     font-family:var(--mono);
-    font-size:12px;
+    font-size:13px;
     letter-spacing:0.5px;
     color:var(--accent);
     border:1px solid var(--accent);
@@ -430,17 +429,17 @@
     align-items:center;
     gap:4px;
     font-family:var(--mono);
-    font-size:10px;
-    letter-spacing:0.5px;
+    font-size:12px;
+    letter-spacing:0.8px;
     text-transform:uppercase;
     color:#0a0a0f;
     background:var(--tag-color, var(--cyan));
     border:1px solid var(--tag-color, var(--cyan));
-    padding:2px 7px;
+    padding:3px 8px;
     border-radius:2px;
     box-shadow:2px 2px 0 rgba(0,0,0,0.35);
   }
-  .ai-tag::before{ content:"▸"; font-size:9px; }
+  .ai-tag::before{ content:"▸"; font-size:11px; }
   .lightbox-desc .ai-tags{ margin-top:14px; }
 
   /* ---------------- LIGHTBOX ---------------- */
@@ -473,12 +472,12 @@
     margin-bottom:14px;
   }
   .lightbox-head h3{
-    font-size:16px;
+    font-size:18px;
     color:var(--cream);
   }
   .eject{
     font-family:var(--mono);
-    font-size:12px;
+    font-size:14px;
     background:transparent;
     border:1px solid var(--dim);
     color:var(--dim);
@@ -514,11 +513,11 @@
   .lightbox-desc{
     margin-top:16px;
     color:var(--dim);
-    font-size:14px;
+    font-size:16px;
   }
   .placeholder-note{
     font-family:var(--mono);
-    font-size:12px;
+    font-size:14px;
     color:var(--amber);
     border:1px dashed var(--amber);
     padding:14px;
@@ -530,7 +529,7 @@
   footer{
     padding:40px 0 60px;
     font-family:var(--mono);
-    font-size:12px;
+    font-size:13px;
     color:var(--dim);
     display:flex;
     justify-content:space-between;
@@ -619,7 +618,7 @@ const PROJECT_DATA = [
           description: "AI-generated speech using a custom persona gives the narration natural, non-robotic delivery. The video itself was manually edited in Kdenlive. The script came out of iterative back-and-forth between marketing staff and the AI model until it matched the team's intended voice, and every prompt and system prompt behind it was produced through meta-prompting.",
           type: "youtube",
           src: "https://www.youtube.com/watch?v=XTQ5v-IFvnU",   // or youtu.be link, or just the bare ID
-          tags: ["speech","script","code"]
+          tags: ["speech","script"]
         },
         {
           title: "GBI TVC Mini Series",
@@ -665,8 +664,7 @@ const TAG_META = {
   music:    { label:"AI MUSIC GEN",    color:"var(--cyan)"    },
   sfx:      { label:"AI SFX GEN",      color:"var(--green)"   },
   script:   { label:"AI SCRIPT GEN",   color:"var(--violet)"  },
-  subtitle: { label:"AI SUBTITLE GEN", color:"var(--cream)"   },
-  code:     { label:"AI GENERATED CODE", color:"var(--amber)" }
+  subtitle: { label:"AI SUBTITLE GEN", color:"var(--cream)"   }
 };
 
 function renderTags(tags){
