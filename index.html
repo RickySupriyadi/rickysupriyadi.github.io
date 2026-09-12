@@ -130,28 +130,153 @@
     padding:0 28px;
   }
 
-  /* ---------------- BOOT OVERLAY ---------------- */
+  /* ---------------- BOOT OVERLAY (CRT / DOS style) ---------------- */
   #boot{
     position:fixed;
     inset:0;
-    background:var(--void);
-    color:var(--green);
-    font-family:var(--mono);
-    font-size:15px;
-    padding:40px;
+    background:#000;
     z-index:100;
-    white-space:pre-wrap;
-    transition:opacity .5s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    transition:opacity .6s ease;
   }
   #boot.hide{
     opacity:0;
     pointer-events:none;
   }
-  #boot .cursor{
-    display:inline-block;
-    width:8px; height:14px;
+
+  /* the monitor housing */
+  .crt{
+    position:relative;
+    width:100%;
+    max-width:920px;
+    aspect-ratio:4/3;
+    max-height:92vh;
+    border-radius:24px;
+    background:radial-gradient(ellipse at center, #0c1f13 0%, #030a05 100%);
+    box-shadow:
+      0 0 0 10px #1a1a1a,
+      0 0 0 14px #050505,
+      0 24px 70px rgba(0,0,0,0.75),
+      inset 0 0 70px rgba(0,0,0,0.85);
+    overflow:hidden;
+  }
+  .crt-screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:6% 7%;
+    text-align:center;
+    color:var(--green);
+    font-family:var(--mono);
+    text-shadow:0 0 5px currentColor, 0 0 18px rgba(61,255,160,0.55);
+    animation:crt-flicker 6s infinite;
+  }
+  /* scanlines */
+  .crt-screen::before{
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.35) 0px,
+      rgba(0,0,0,0.35) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events:none;
+    z-index:2;
+  }
+  /* rounded vignette to fake screen curvature */
+  .crt-screen::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    pointer-events:none;
+    z-index:2;
+  }
+  @keyframes crt-flicker{
+    0%,100%{ opacity:1; }
+    91%{ opacity:1; }
+    92%{ opacity:0.82; }
+    93%{ opacity:1; }
+    97%{ opacity:0.9; }
+    98%{ opacity:1; }
+  }
+
+  .boot-langselect{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:100%;
+  }
+  .boot-langselect.boot-hidden{ display:none; }
+  .boot-title{
+    font-size:clamp(26px, 5vw, 46px);
+    letter-spacing:2px;
+    margin-bottom:14px;
+  }
+  .boot-sub{
+    font-size:clamp(13px, 2.2vw, 17px);
+    color:#8fe8b8;
+    opacity:0.85;
+    margin-bottom:26px;
+    letter-spacing:0.5px;
+  }
+  .lang-options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    width:100%;
+    max-width:440px;
+  }
+  .lang-options button{
+    font-family:var(--mono);
+    font-size:clamp(18px, 3.4vw, 28px);
+    letter-spacing:1px;
+    background:transparent;
+    border:2px solid var(--green);
+    color:var(--green);
+    text-shadow:inherit;
+    padding:10px 14px;
+    cursor:pointer;
+    border-radius:2px;
+  }
+  .lang-options button:hover,
+  .lang-options button:focus-visible{
     background:var(--green);
-    margin-left:2px;
+    color:#04140a;
+    text-shadow:none;
+  }
+  .boot-countdown{
+    margin-top:22px;
+    font-size:clamp(12px, 2vw, 15px);
+    color:#8fe8b8;
+    opacity:0.75;
+  }
+
+  .boot-text{
+    position:relative;
+    z-index:1;
+    font-size:clamp(20px, 4vw, 32px);
+    line-height:1.6;
+    white-space:pre-wrap;
+    margin:0;
+  }
+  .boot-text.boot-hidden{ display:none; }
+  .boot-text .cursor{
+    display:inline-block;
+    width:0.5em; height:1em;
+    background:var(--green);
+    margin-left:3px;
+    vertical-align:text-bottom;
     animation:blink 1s steps(1) infinite;
   }
   @keyframes blink{ 50%{ opacity:0; } }
@@ -204,6 +329,32 @@
   .deck-nav button:hover{
     border-color:var(--accent, var(--cyan));
     color:var(--accent, var(--cyan));
+  }
+
+  .lang-switch{
+    display:flex;
+    gap:4px;
+    margin-left:8px;
+  }
+  .lang-switch button{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.5px;
+    background:var(--panel);
+    color:var(--dim);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:6px 8px;
+    cursor:pointer;
+  }
+  .lang-switch button:hover{
+    color:var(--green);
+    border-color:var(--green);
+  }
+  .lang-switch button.active{
+    color:var(--void);
+    background:var(--green);
+    border-color:var(--green);
   }
 
   /* ---------------- HERO ---------------- */
@@ -547,7 +698,25 @@
 <body>
 
 <!-- BOOT SEQUENCE OVERLAY -->
-<div id="boot" aria-hidden="true"></div>
+<div id="boot" aria-hidden="true">
+  <div class="crt">
+    <div class="crt-screen">
+      <div class="boot-langselect" id="bootLangSelect">
+        <div class="boot-title">SELECT LANGUAGE</div>
+        <div class="boot-sub">PRESS 1–5 OR CLICK · DEFAULTS TO ENGLISH</div>
+        <div class="lang-options" id="langOptions">
+          <button type="button" data-lang="en">[1] ENGLISH</button>
+          <button type="button" data-lang="id">[2] BAHASA INDONESIA</button>
+          <button type="button" data-lang="zh">[3] 简体中文</button>
+          <button type="button" data-lang="vi">[4] TIẾNG VIỆT</button>
+          <button type="button" data-lang="tw">[5] TWI</button>
+        </div>
+        <div class="boot-countdown" id="bootCountdown"></div>
+      </div>
+      <pre id="bootText" class="boot-text boot-hidden"></pre>
+    </div>
+  </div>
+</div>
 
 <header class="deck">
   <div class="deck-inner">
@@ -556,17 +725,24 @@
       PORTFOLIO.SYS
     </div>
     <nav class="deck-nav" id="deckNav"></nav>
+    <div class="lang-switch" id="langSwitch">
+      <button type="button" data-lang="en" title="English">EN</button>
+      <button type="button" data-lang="id" title="Bahasa Indonesia">ID</button>
+      <button type="button" data-lang="zh" title="简体中文">中文</button>
+      <button type="button" data-lang="vi" title="Tiếng Việt">VI</button>
+      <button type="button" data-lang="tw" title="Twi">TW</button>
+    </div>
   </div>
 </header>
 
 <section class="hero">
   <div class="wrap">
-    <div class="kicker">SYSTEM ONLINE — ARCHIVE LOADED</div>
-    <h1>A working record of things<br>built with AI.</h1>
-    <p class="tagline">Projects across code, generated media, data work, and the back-and-forth of getting a model to actually do what you mean. Updated as things ship — not a highlight reel, an archive.</p>
+    <div class="kicker" id="heroKicker">SYSTEM ONLINE — ARCHIVE LOADED</div>
+    <h1 id="heroTitle">A working record of things<br>built with AI.</h1>
+    <p class="tagline" id="heroTagline">Projects across code, generated media, data work, and the back-and-forth of getting a model to actually do what you mean. Updated as things ship — not a highlight reel, an archive.</p>
     <div class="status">
-      <span>4 CATEGORIES INDEXED</span>
-      <span>LOCAL PLAYBACK — NO CONNECTION REQUIRED</span>
+      <span id="statusCategories">4 CATEGORIES INDEXED</span>
+      <span id="statusLocal">LOCAL PLAYBACK — NO CONNECTION REQUIRED</span>
     </div>
   </div>
 </section>
@@ -574,7 +750,7 @@
 <main class="wrap" id="main"></main>
 
 <footer class="wrap">
-  <span>PORTFOLIO.SYS — LOCAL BUILD</span>
+  <span id="footerBuild">PORTFOLIO.SYS — LOCAL BUILD</span>
   <span id="clock"></span>
 </footer>
 
@@ -591,6 +767,164 @@
 </div>
 
 <script>
+/* ============================================================
+   LOCALIZATION
+   Covers the interface chrome (boot screen, hero, status line,
+   footer, empty-slot notes, tag labels). Individual project
+   titles/descriptions in PROJECT_DATA are left as authored, since
+   those are personal write-ups rather than interface text.
+   ============================================================ */
+const I18N = {
+  en:{
+    htmlLang:"en", name:"ENGLISH",
+    bootLines:["LOADING PORTFOLIO.SYS ...","MOUNTING ASSET ARCHIVE ...","INDEXING PROJECTS ... OK","READY."],
+    heroKicker:"SYSTEM ONLINE — ARCHIVE LOADED",
+    heroTitleHTML:"A working record of things<br>built with AI.",
+    heroTagline:"Projects across code, generated media, data work, and the back-and-forth of getting a model to actually do what you mean. Updated as things ship — not a highlight reel, an archive.",
+    statusCategories:"4 CATEGORIES INDEXED",
+    statusLocal:"LOCAL PLAYBACK — NO CONNECTION REQUIRED",
+    footerBuild:"PORTFOLIO.SYS — LOCAL BUILD",
+    eject:"⏏ EJECT",
+    emptySlotTitle:"Untitled Slot",
+    emptySlotDesc:"Send Claude the asset path and context to fill this in.",
+    awaitingData:"AWAITING PROJECT DATA",
+    slotReserved:"slot reserved",
+    tagVideo:"VIDEO", tagAudio:"AUDIO", tagImage:"IMAGE",
+    aiTags:{ code:"AI GENERATED CODE", video:"AI VIDEO GEN", speech:"AI SPEECH GEN", music:"AI MUSIC GEN", sfx:"AI SFX GEN", script:"AI SCRIPT GEN", subtitle:"AI SUBTITLE GEN" },
+    langMenuSub:"PRESS 1–5 OR CLICK · DEFAULTS TO ENGLISH",
+    langCountdown:n=>`AUTO-SELECTING ENGLISH IN ${n}...`
+  },
+  id:{
+    htmlLang:"id", name:"BAHASA INDONESIA",
+    bootLines:["MEMUAT PORTFOLIO.SYS ...","MEMASANG ARSIP ASET ...","MENGINDEKS PROYEK ... OK","SIAP."],
+    heroKicker:"SISTEM AKTIF — ARSIP DIMUAT",
+    heroTitleHTML:"Catatan kerja tentang hal-hal<br>yang dibangun dengan AI.",
+    heroTagline:"Proyek yang mencakup kode, media hasil AI, pengolahan data, dan proses bolak-balik agar model benar-benar melakukan apa yang dimaksud. Diperbarui setiap kali ada yang rilis — bukan sorotan terbaik, melainkan arsip.",
+    statusCategories:"4 KATEGORI TERINDEKS",
+    statusLocal:"PEMUTARAN LOKAL — TANPA KONEKSI INTERNET",
+    footerBuild:"PORTFOLIO.SYS — BUILD LOKAL",
+    eject:"⏏ KELUARKAN",
+    emptySlotTitle:"Slot Belum Diisi",
+    emptySlotDesc:"Kirim path aset dan konteksnya ke Claude untuk mengisi slot ini.",
+    awaitingData:"MENUNGGU DATA PROYEK",
+    slotReserved:"slot dicadangkan",
+    tagVideo:"VIDEO", tagAudio:"AUDIO", tagImage:"GAMBAR",
+    aiTags:{ code:"KODE HASIL AI", video:"VIDEO HASIL AI", speech:"SUARA HASIL AI", music:"MUSIK HASIL AI", sfx:"SFX HASIL AI", script:"NASKAH HASIL AI", subtitle:"SUBTITEL HASIL AI" },
+    langMenuSub:"TEKAN 1–5 ATAU KLIK · DEFAULT: BAHASA INGGRIS",
+    langCountdown:n=>`OTOMATIS MEMILIH BAHASA INGGRIS DALAM ${n}...`
+  },
+  zh:{
+    htmlLang:"zh-CN", name:"简体中文",
+    bootLines:["正在加载 PORTFOLIO.SYS ...","正在挂载素材库 ...","正在索引项目 ... 完成","已就绪。"],
+    heroKicker:"系统在线 — 档案已加载",
+    heroTitleHTML:"一份关于 AI 构建作品的<br>工作记录。",
+    heroTagline:"涵盖代码、AI 生成媒体、数据处理，以及反复调试模型直到它真正理解你意图的过程。随项目上线持续更新——不是精选集锦，而是一份档案。",
+    statusCategories:"已索引 4 个分类",
+    statusLocal:"本地播放 — 无需联网",
+    footerBuild:"PORTFOLIO.SYS — 本地构建",
+    eject:"⏏ 弹出",
+    emptySlotTitle:"未命名槽位",
+    emptySlotDesc:"将素材路径和背景信息发给 Claude 以填充此槽位。",
+    awaitingData:"等待项目数据",
+    slotReserved:"槽位保留",
+    tagVideo:"视频", tagAudio:"音频", tagImage:"图片",
+    aiTags:{ code:"AI 生成代码", video:"AI 视频生成", speech:"AI 语音生成", music:"AI 音乐生成", sfx:"AI 音效生成", script:"AI 脚本生成", subtitle:"AI 字幕生成" },
+    langMenuSub:"按 1–5 或点击选择 · 默认英语",
+    langCountdown:n=>`将在 ${n} 秒后自动选择英语...`
+  },
+  vi:{
+    htmlLang:"vi", name:"TIẾNG VIỆT",
+    bootLines:["ĐANG TẢI PORTFOLIO.SYS ...","ĐANG GẮN KHO TÀI NGUYÊN ...","ĐANG LẬP CHỈ MỤC DỰ ÁN ... XONG","SẴN SÀNG."],
+    heroKicker:"HỆ THỐNG TRỰC TUYẾN — ĐÃ TẢI KHO LƯU TRỮ",
+    heroTitleHTML:"Nhật ký công việc về những gì<br>được xây dựng cùng AI.",
+    heroTagline:"Các dự án về mã nguồn, nội dung do AI tạo, xử lý dữ liệu, và quá trình trao đổi qua lại để mô hình thực sự làm đúng ý bạn. Cập nhật mỗi khi có sản phẩm mới — không phải bộ sưu tập nổi bật, mà là một kho lưu trữ.",
+    statusCategories:"ĐÃ LẬP CHỈ MỤC 4 DANH MỤC",
+    statusLocal:"PHÁT LẠI CỤC BỘ — KHÔNG CẦN KẾT NỐI MẠNG",
+    footerBuild:"PORTFOLIO.SYS — BẢN DỰNG CỤC BỘ",
+    eject:"⏏ ĐẨY RA",
+    emptySlotTitle:"Ô Trống",
+    emptySlotDesc:"Gửi đường dẫn tệp và bối cảnh cho Claude để lấp đầy ô này.",
+    awaitingData:"ĐANG CHỜ DỮ LIỆU DỰ ÁN",
+    slotReserved:"ô được giữ chỗ",
+    tagVideo:"VIDEO", tagAudio:"ÂM THANH", tagImage:"HÌNH ẢNH",
+    aiTags:{ code:"MÃ DO AI TẠO", video:"VIDEO DO AI TẠO", speech:"GIỌNG NÓI DO AI TẠO", music:"NHẠC DO AI TẠO", sfx:"HIỆU ỨNG ÂM THANH DO AI TẠO", script:"KỊCH BẢN DO AI TẠO", subtitle:"PHỤ ĐỀ DO AI TẠO" },
+    langMenuSub:"NHẤN 1–5 HOẶC NHẤP ĐỂ CHỌN · MẶC ĐỊNH: TIẾNG ANH",
+    langCountdown:n=>`TỰ ĐỘNG CHỌN TIẾNG ANH SAU ${n}...`
+  },
+  tw:{
+    /* Twi — best-effort translation; consider a native-speaker review before shipping. */
+    htmlLang:"tw", name:"TWI",
+    bootLines:["ƐREHYƐ PORTFOLIO.SYS ...","ƐRETO NNEƐMA NIMDEƐ NO ...","ƐREKA NHYEHYƐƐ NO HO NSƐM ... EYƐ","ƐSIESIE."],
+    heroKicker:"SYSTEM NO REYƐ ADWUMA — WƆABUE NNEƐMA NO",
+    heroTitleHTML:"Nnwuma a wɔde AI ayɛ<br>ho amanneɛ.",
+    heroTagline:"Nnwuma a ɛfa code, AI ayɛ media, data adwuma, ne ɔkasakasa a ɛma AI yɛ deɛ wopɛ ampa ho. Wɔsesa no bere biara a adwuma foforɔ aba — ɛnyɛ nsɛnkyerɛnneɛ pa ara, ɛyɛ nkorabata.",
+    statusCategories:"AKUW 4 A WƆAKYEREW",
+    statusLocal:"WƆBƆ NO WƆ HƆ — WƆNHIA INTERNET",
+    footerBuild:"PORTFOLIO.SYS — HƆ BUILD",
+    eject:"⏏ YI",
+    emptySlotTitle:"Slot A Ɛnnyɛ Hwee",
+    emptySlotDesc:"Fa asset no kwan ne emu nsɛm ma Claude na ɔde bɛhyɛ slot yi mu.",
+    awaitingData:"ƐRETWƐN ADWUMA HO NSƐM",
+    slotReserved:"wɔahwɛ slot yi asie",
+    tagVideo:"VIDEO", tagAudio:"NNE", tagImage:"MFONINI",
+    aiTags:{ code:"AI YƐƐ CODE", video:"AI YƐƐ VIDEO", speech:"AI YƐƐ KASA", music:"AI YƐƐ NNWOM", sfx:"AI YƐƐ NNE-EFFECT", script:"AI YƐƐ SCRIPT", subtitle:"AI YƐƐ SUBTITLE" },
+    langMenuSub:"PIA 1–5 ANAASƐ KLIK · SƐ WANYI BIARA A, ƐBƐYƐ ENGLISH",
+    langCountdown:n=>`ƐBƐYI ENGLISH WƆ SƐKƐNT ${n} MU...`
+  }
+};
+
+let currentLang = 'en';
+
+function t(key){
+  const dict = I18N[currentLang] || I18N.en;
+  return (key in dict) ? dict[key] : I18N.en[key];
+}
+
+function applyTranslations(lang){
+  currentLang = I18N[lang] ? lang : 'en';
+  const d = I18N[currentLang];
+  document.documentElement.lang = d.htmlLang;
+
+  document.getElementById('heroKicker').textContent = d.heroKicker;
+  document.getElementById('heroTitle').innerHTML = d.heroTitleHTML;
+  document.getElementById('heroTagline').textContent = d.heroTagline;
+  document.getElementById('statusCategories').textContent = d.statusCategories;
+  document.getElementById('statusLocal').textContent = d.statusLocal;
+  document.getElementById('footerBuild').textContent = d.footerBuild;
+  document.getElementById('lbClose').textContent = d.eject;
+
+  // empty slots
+  document.querySelectorAll('.tape.empty .empty-mark').forEach(el=>{
+    const cat = el.dataset.cat || '';
+    el.innerHTML = `${d.awaitingData}<br>— ${d.slotReserved}, ${cat} —`;
+  });
+  document.querySelectorAll('.tape.empty .label h3').forEach(el=> el.textContent = d.emptySlotTitle);
+  document.querySelectorAll('.tape.empty .label p').forEach(el=> el.textContent = d.emptySlotDesc);
+
+  // tag pills (VIDEO/AUDIO/IMAGE badge on filled cards)
+  document.querySelectorAll('.tagpill').forEach(el=>{
+    const type = el.dataset.type;
+    if(type === 'audio') el.textContent = d.tagAudio;
+    else if(type === 'image') el.textContent = d.tagImage;
+    else el.textContent = d.tagVideo;
+  });
+
+  // AI generation badges
+  document.querySelectorAll('.ai-tag').forEach(el=>{
+    const key = el.dataset.tagkey;
+    if(key && d.aiTags[key]) el.textContent = d.aiTags[key];
+  });
+
+  // language switch buttons in header
+  document.querySelectorAll('#langSwitch button').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+}
+
+document.querySelectorAll('#langSwitch button').forEach(btn=>{
+  btn.addEventListener('click', ()=> applyTranslations(btn.dataset.lang));
+});
+
 /* ============================================================
    PROJECT DATA — edit this to add / replace projects.
    See the HTML comment at the top of the file for the format.
@@ -617,7 +951,7 @@ const PROJECT_DATA = [
           src: "https://youtu.be/g63zzv1r5hU",   // or youtu.be link, or just the bare ID
           tags: ["code"]
         },
-        { empty:true }, { empty:true }
+        { empty:true }
       ]}
     ]
   },
@@ -685,10 +1019,12 @@ const TAG_META = {
 
 function renderTags(tags){
   if(!tags || !tags.length) return '';
+  const d = I18N[currentLang] || I18N.en;
   return `<div class="ai-tags">${tags.map(key=>{
     const meta = TAG_META[key];
     if(!meta) return '';
-    return `<span class="ai-tag" style="--tag-color:${meta.color}">${meta.label}</span>`;
+    const label = d.aiTags[key] || meta.label;
+    return `<span class="ai-tag" data-tagkey="${key}" style="--tag-color:${meta.color}">${label}</span>`;
   }).join('')}</div>`;
 }
 
@@ -754,22 +1090,25 @@ function renderTape(slot, accent, catLabel){
   const el = document.createElement('div');
   el.style.setProperty('--accent', accent);
 
+  const d0 = I18N[currentLang] || I18N.en;
+
   if(slot.empty){
     el.className = 'tape empty';
     el.innerHTML = `
       <div class="window">
-        <div class="empty-mark">AWAITING PROJECT DATA<br>— slot reserved, ${catLabel} —</div>
+        <div class="empty-mark" data-cat="${catLabel}">${d0.awaitingData}<br>— ${d0.slotReserved}, ${catLabel} —</div>
       </div>
       <div class="label">
-        <h3>Untitled Slot</h3>
-        <p>Send Claude the asset path and context to fill this in.</p>
+        <h3>${d0.emptySlotTitle}</h3>
+        <p>${d0.emptySlotDesc}</p>
       </div>`;
     return el;
   }
 
   el.className = 'tape filled' + (slot.type === 'image' ? ' type-image' : '');
   const icon = slot.type === 'audio' ? ICONS.audio : slot.type === 'image' ? ICONS.image : ICONS.play;
-  const tagLabel = slot.type === 'youtube' ? 'VIDEO' : (slot.type || 'video').toUpperCase();
+  const pillType = slot.type === 'youtube' ? 'video' : (slot.type || 'video');
+  const tagLabel = pillType === 'audio' ? d0.tagAudio : pillType === 'image' ? d0.tagImage : d0.tagVideo;
   el.innerHTML = `
     <div class="window">
       <span class="reel l"></span><span class="reel r"></span>
@@ -778,7 +1117,7 @@ function renderTape(slot, accent, catLabel){
     <div class="label">
       <h3>${slot.title}</h3>
       <p>${slot.description || ''}</p>
-      <span class="tagpill">${tagLabel}</span>
+      <span class="tagpill" data-type="${pillType}">${tagLabel}</span>
       ${renderTags(slot.tags)}
     </div>`;
   el.addEventListener('click', ()=>openLightbox(slot, accent));
@@ -858,29 +1197,84 @@ function tick(){
 tick();
 setInterval(tick, 1000);
 
-/* ---------------- BOOT SEQUENCE ---------------- */
+/* ---------------- BOOT SEQUENCE (language select -> CRT boot text) ---------------- */
 (function boot(){
-  const el = document.getElementById('boot');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduced){ el.classList.add('hide'); return; }
+  const overlay = document.getElementById('boot');
+  const langSelect = document.getElementById('bootLangSelect');
+  const countdownEl = document.getElementById('bootCountdown');
+  const bootTextEl = document.getElementById('bootText');
+  const reduced = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const lines = [
-    "LOADING PORTFOLIO.SYS ...",
-    "MOUNTING ASSET ARCHIVE ...",
-    "INDEXING PROJECTS ... OK",
-    "READY."
-  ];
-  let i = 0;
-  function next(){
-    if(i < lines.length){
-      el.textContent += (i>0 ? "\n" : "") + lines[i];
-      i++;
-      setTimeout(next, 260);
-    } else {
-      setTimeout(()=> el.classList.add('hide'), 400);
-    }
+  let timer = null;
+  let secondsLeft = 8;
+
+  function updateCountdown(){
+    const d = I18N.en; // countdown shown before a language is chosen, stays in English
+    countdownEl.textContent = d.langCountdown(secondsLeft);
   }
-  next();
+
+  function startCountdown(){
+    updateCountdown();
+    timer = setInterval(()=>{
+      secondsLeft--;
+      if(secondsLeft <= 0){
+        clearInterval(timer);
+        chooseLanguage('en');
+        return;
+      }
+      updateCountdown();
+    }, 1000);
+  }
+
+  function chooseLanguage(lang){
+    clearInterval(timer);
+    document.removeEventListener('keydown', onKeydown);
+    applyTranslations(lang);
+    langSelect.classList.add('boot-hidden');
+    bootTextEl.classList.remove('boot-hidden');
+    runBootText();
+  }
+
+  function onKeydown(e){
+    const map = {'1':'en','2':'id','3':'zh','4':'vi','5':'tw'};
+    if(map[e.key]) chooseLanguage(map[e.key]);
+    else if(e.key === 'Enter') chooseLanguage('en');
+  }
+
+  document.querySelectorAll('#langOptions button').forEach(btn=>{
+    btn.addEventListener('click', ()=> chooseLanguage(btn.dataset.lang));
+  });
+  document.addEventListener('keydown', onKeydown);
+
+  function runBootText(){
+    if(reduced){ overlay.classList.add('hide'); return; }
+    const lines = t('bootLines');
+    let i = 0;
+    function next(){
+      if(i < lines.length){
+        bootTextEl.textContent += (i>0 ? "\n" : "") + lines[i];
+        i++;
+        setTimeout(next, 300);
+      } else {
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        bootTextEl.appendChild(cursor);
+        setTimeout(()=> overlay.classList.add('hide'), 700);
+      }
+    }
+    next();
+  }
+
+  // populate the initial (English) chrome immediately so the page behind
+  // the boot screen isn't blank while the user is picking a language
+  applyTranslations('en');
+
+  if(reduced){
+    overlay.classList.add('hide');
+    return;
+  }
+  startCountdown();
 })();
 </script>
 </body>
