@@ -297,6 +297,42 @@
   }
   @keyframes blink{ 50%{ opacity:0; } }
 
+
+  /* ---------------- PARALLAX BACKGROUND ----------------
+     Three fixed layers (far room / desk / near foreground) that drift at
+     different speeds as you scroll. Opacities are kept low and a vignette
+     darkens the middle so cards and tags stay readable. Layer images are
+     optional: a missing file just fails silently. */
+  .parallax{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+    pointer-events:none;
+    background:var(--void);
+  }
+  .plx-layer{
+    position:absolute;
+    left:0; right:0; top:0;
+    height:calc(100% + var(--shift, 0px));
+    background-repeat:no-repeat;
+    background-size:cover;
+    will-change:transform;
+    transform:translate3d(0,0,0);
+  }
+  .plx-1{ --shift:70px;  background-image:url("assets/textures/prlx-lyr1.png"); background-position:center;        opacity:0.55; }
+  .plx-2{ --shift:170px; background-image:url("assets/textures/prlx-lyr2.png"); background-position:center bottom; opacity:0.38; }
+  .plx-3{ --shift:340px; background-image:url("assets/textures/prlx-lyr3.png"); background-position:center bottom; opacity:0.32; }
+  .plx-fade{
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(to bottom, rgba(11,7,22,0.85) 0%, rgba(11,7,22,0) 22%, rgba(11,7,22,0) 70%, rgba(11,7,22,0.7) 100%),
+      radial-gradient(ellipse at center, rgba(11,7,22,0.7) 0%, rgba(11,7,22,0.35) 55%, rgba(11,7,22,0.1) 100%);
+  }
+  /* keep page content above the parallax layers */
+  .hero, main, footer{ position:relative; z-index:1; }
+
   /* ---------------- NAV / TAPE DECK ---------------- */
   header.deck{
     position:sticky;
@@ -755,6 +791,13 @@
 </style>
 </head>
 <body>
+<div class="parallax" aria-hidden="true">
+  <div class="plx-layer plx-1" data-shift="70"></div>
+  <div class="plx-layer plx-2" data-shift="170"></div>
+  <div class="plx-layer plx-3" data-shift="340"></div>
+  <div class="plx-fade"></div>
+</div>
+
 
 <!-- BOOT SEQUENCE OVERLAY -->
 <div id="boot" aria-hidden="true">
@@ -1351,6 +1394,32 @@ setInterval(tick, 1000);
     return;
   }
   startCountdown();
+})();
+
+/* ---------------- PARALLAX ----------------
+   Scroll progress (0 at top, 1 at bottom) moves each layer up by up to its
+   own data-shift pixels — far layer barely moves, near layer moves most.
+   Bounded, so it works for any page length. Static for reduced-motion. */
+(function(){
+  const layers = Array.from(document.querySelectorAll('.plx-layer'));
+  if(!layers.length) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let ticking = false;
+  function update(){
+    ticking = false;
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const progress = Math.min(1, Math.max(0, window.scrollY / max));
+    layers.forEach(el=>{
+      const shift = parseFloat(el.dataset.shift) || 0;
+      el.style.transform = `translate3d(0, ${(-progress * shift).toFixed(1)}px, 0)`;
+    });
+  }
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(update); }
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  update();
 })();
 </script>
 </body>
