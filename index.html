@@ -634,19 +634,23 @@
   .ai-tag{
     display:inline-flex;
     align-items:center;
-    gap:4px;
+    gap:5px;
     font-family:var(--mono);
-    font-size:13px;
+    font-size:16px;
+    line-height:1.1;
     letter-spacing:0.8px;
     text-transform:uppercase;
-    color:#0a0a0f;
-    background:var(--tag-color, var(--cyan));
+    /* dark chip + bright glowing text: much easier to read with the thin
+       pixel font and the film-grain overlay than dark text on a bright fill */
+    color:var(--tag-color, var(--cyan));
+    background:rgba(8,5,16,0.92);
     border:1px solid var(--tag-color, var(--cyan));
-    padding:3px 8px;
+    padding:3px 9px 2px;
     border-radius:2px;
-    box-shadow:2px 2px 0 rgba(0,0,0,0.35);
+    text-shadow:0 0 6px color-mix(in srgb, var(--tag-color, var(--cyan)) 55%, transparent);
+    box-shadow:2px 2px 0 color-mix(in srgb, var(--tag-color, var(--cyan)) 45%, transparent);
   }
-  .ai-tag::before{ content:"▸"; font-size:12px; }
+  .ai-tag::before{ content:"▸"; font-size:13px; }
   .lightbox-desc .ai-tags{ margin-top:14px; }
 
   /* ---------------- LIGHTBOX ---------------- */
@@ -1032,7 +1036,14 @@ const PROJECT_DATA = [
           src: "https://youtu.be/3XhK84t92-s",   // or youtu.be link, or just the bare ID
           tags: ["speech","music","sfx","script","subtitle"]
         },
-        { empty:true }, { empty:true }, { empty:true }, { empty:true }
+        {
+          title: "AutoFame Jingles",
+          description: "AutoFame, an automotive dealership, commissioned a collection of original jingles across multiple music genres for use in Instagram Reels. The primary challenge was overcoming the limitations of 2025-era AI music generators, which struggled to produce accurate bilingual vocals in English and Indonesian within the same song. Through carefully engineered prompting techniques, the project successfully achieved clear, natural pronunciation in both languages while maintaining consistent vocal quality across diverse musical styles, including metal, jazz, and pop. This project demonstrates the creative potential of AI music generation and how advanced prompting techniques can push generative models beyond their conventional limitations.",
+          type: "youtube",
+          src: "https://youtu.be/5Hz0cl_UTK0",   // or youtu.be link, or just the bare ID
+          tags: ["script","music"]
+        },
+        { empty:true }, { empty:true }, { empty:true }
       ]}
     ]
   },
